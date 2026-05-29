@@ -53,6 +53,11 @@ service cloud.firestore {
       allow read, write: if isAuthorized();
     }
 
+    // ── IT Ops Hub — Directorio de equipo ─────────────────────
+    match /itops_equipo/{docId} {
+      allow read, write: if isAuthorized();
+    }
+
     // ── BacarPass — usuarios de la app ───────────────────────
     match /artifacts/{artifactId}/public/data/app_users/{docId} {
       allow read: if isAuthorized();
