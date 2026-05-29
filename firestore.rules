@@ -1,0 +1,67 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ── Helpers ──────────────────────────────────────────────
+    // Solo usuarios autenticados con email corporativo @bacarsa.com.ar
+    // o con el email de IT explícitamente añadido.
+    function isAuthorized() {
+      return request.auth != null
+        && request.auth.token.email != null
+        && (
+          request.auth.token.email.matches('.*@bacarsa\\.com\\.ar')
+          || request.auth.token.email.matches('.*@bacar\\.app')
+          || request.auth.token.email in [
+            'sistemas.TI@bacarsa.com.ar',
+            'implementaciones.it@bacarsa.com.ar'
+          ]
+        );
+    }
+
+    // ── BacarPass passwords ───────────────────────────────────
+    // Solo lectura para usuarios autorizados; escritura bloqueada desde el cliente.
+    match /artifacts/{artifactId}/public/data/passwords/{docId} {
+      allow read: if isAuthorized();
+      allow write: if false;
+    }
+
+    // Colecciones intermedias (necesario para navegar la jerarquía)
+    match /artifacts/{artifactId} {
+      allow read: if isAuthorized();
+    }
+    match /artifacts/{artifactId}/public/data {
+      allow read: if isAuthorized();
+    }
+
+    // ── IT Ops Hub — Gastos SaaS ─────────────────────────────
+    match /itops_gastos/{docId} {
+      allow read, write: if isAuthorized();
+    }
+
+    // ── IT Ops Hub — Tickets (legacy, migrado a MySQL) ───────
+    match /itops_tickets/{docId} {
+      allow read, write: if isAuthorized();
+    }
+
+    // ── IT Ops Hub — Documentación dinámica ──────────────────
+    match /itops_docs/{docId} {
+      allow read, write: if isAuthorized();
+    }
+
+    // ── IT Ops Hub — Archivos y programas (metadata) ─────────
+    match /itops_archivos/{docId} {
+      allow read, write: if isAuthorized();
+    }
+
+    // ── BacarPass — usuarios de la app ───────────────────────
+    match /artifacts/{artifactId}/public/data/app_users/{docId} {
+      allow read: if isAuthorized();
+      allow write: if false;
+    }
+
+    // ── Default: denegar todo lo demás ───────────────────────
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

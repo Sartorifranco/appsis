@@ -1,0 +1,33 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+
+    // Solo usuarios autenticados con email corporativo @bacarsa.com.ar
+    function isAuthorized() {
+      return request.auth != null
+        && request.auth.token.email != null
+        && (
+          request.auth.token.email.matches('.*@bacarsa\\.com\\.ar')
+          || request.auth.token.email.matches('.*@bacar\\.app')
+          || request.auth.token.email in [
+            'sistemas.TI@bacarsa.com.ar',
+            'implementaciones.it@bacarsa.com.ar'
+          ]
+        );
+    }
+
+    // ── Archivos IT Ops Hub ────────────────────────────────────
+    // Lectura pública para descarga directa (links compartibles).
+    // Escritura solo para usuarios autorizados.
+    match /it-ops/files/{allPaths=**} {
+      allow read:  if true;
+      allow write: if isAuthorized()
+        && request.resource.size < 500 * 1024 * 1024; // máx 500 MB por archivo
+    }
+
+    // ── Default: denegar todo lo demás ────────────────────────
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}

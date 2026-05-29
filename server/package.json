@@ -1,0 +1,16 @@
+{
+  "name": "it-ops-hub-server",
+  "version": "1.0.0",
+  "description": "Proxy local para NVR Hikvision/Dahua (red interna)",
+  "main": "nvr-proxy.cjs",
+  "scripts": {
+    "start": "node nvr-proxy.cjs",
+    "dev": "node --watch nvr-proxy.cjs"
+  },
+  "dependencies": {
+    "axios": "^1.7.0",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.0",
+    "express": "^4.19.0"
+  }
+}
