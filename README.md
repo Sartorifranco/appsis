@@ -123,7 +123,11 @@ Por defecto crea `admin@admin.com` / `admin1` (Firebase exige contraseña ≥ 6 
 
 ### Reglas Firestore y email
 
-Las reglas en [`firestore.rules`](firestore.rules) solo permiten usuarios con email:
+> **Estado actual (octubre 2026): fuera de uso.** Las reglas de Firestore de `legajosonline-959f6` son compartidas por todas las apps del proyecto y se administran solo desde el repo de BacarPass (`firestore.rules`). Las colecciones `itops_*` y el acceso a las credenciales de BacarPass están bloqueados. Este repo ya no despliega reglas ni Cloud Functions: su codebase `default` coincidía con el del Libro de Guardia y un deploy podía borrar sus funciones. Para reactivar el IT Ops Hub hay que agregar sus reglas en el repo de BacarPass y darle a las funciones un codebase propio.
+>
+> Lo que sigue describe cómo funcionaba antes.
+
+Las reglas anteriores solo permitían usuarios con email:
 
 - `*@bacarsa.com.ar`
 - `*@bacar.app`
